@@ -132,22 +132,15 @@ binary_query = [1 if term in tokenizedQuery else 0 for term in terms]
 print(f'The binary query is {binary_query}\n')
 
 
-# Function to calculate the similarity between two vectors for ranking
-def cosine_similarity(vector1, vector2):
+# Function to calculate the document score based on the query
+def dotProduct(vector1, vector2):
     dot_product = sum(x * y for x, y in zip(vector1, vector2))
-    magnitude1 = math.sqrt(sum(x**2 for x in vector1))
-    magnitude2 = math.sqrt(sum(x**2 for x in vector2))
-
-    # Handle division by 0
-    if magnitude1 == 0 or magnitude2 == 0:
-        return 1
-
-    return dot_product/(magnitude1*magnitude2)
+    return dot_product
 
 
 # Calculate the score of each document compared with the binary user query
 for doc_vector in docMatrix:
-    score = cosine_similarity(binary_query, doc_vector)
+    score = dotProduct(binary_query, doc_vector)
     docScores.append(round(score, 4))
 
 for i in range(len(docScores)):
