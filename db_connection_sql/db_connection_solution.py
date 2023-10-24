@@ -30,6 +30,10 @@ def connectDataBase():
                                 host=DB_HOST,
                                 port=DB_PORT,
                                 cursor_factory=RealDictCursor)
+
+        cur = conn.cursor()
+        createTables(cur, conn)
+
         return conn
 
     except:
@@ -182,3 +186,42 @@ def getIndex(cur):
     index = '{' + index[:-2] + '}'
 
     return index
+
+def createTables(cur, conn):
+
+    try:
+
+        sql = "create table if not exists categories(id integer not null, " \
+              "name character varying(255) not null, " \
+              "constraint categories_pk primary key (id))"
+        cur.execute(sql)
+
+        sql = "create table if not exists documents(doc_number integer not null, "\
+              "text character varying(255) not null, " \
+              "title character varying(255) not null, " \
+              "num_chars integer not null, " \
+              "date date not null, " \
+              "category_id integer not null, " \
+              "constraint documents_pk primary key (doc_number), " \
+              "constraint category_id_fkey foreign key (category_id) references categories (id))"
+        cur.execute(sql)
+
+        sql = "create table if not exists terms(term character varying(255) not null, " \
+              "num_chars integer not null, " \
+              "constraint terms_pk primary key (term))"
+        cur.execute(sql)
+
+        sql = "create table if not exists indexes(term character varying(255) not null, " \
+              "doc_number integer not null, " \
+              "count integer not null, " \
+              "constraint indexes_pk primary key (term, doc_number), "\
+              "constraint doc_number_fkey foreign key (doc_number) references documents (doc_number), "\
+              "constraint term_fkey foreign key (term) references terms (term))"
+        cur.execute(sql)
+
+        conn.commit()
+
+    except:
+
+        conn.rollback()
+        print("There was a problem during the database creation or the database already exists.")
