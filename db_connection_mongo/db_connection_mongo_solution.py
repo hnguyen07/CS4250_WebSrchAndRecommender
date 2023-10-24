@@ -17,13 +17,15 @@ import datetime
 def connectDataBase():
 
     # Create a database connection object using pymongo
-    DB_HOST = 'localhost:27017'
+    DB_NAME = "corpusMongo"
+    DB_HOST = "localhost"
+    DB_PORT = 27017
 
     try:
         # Creating an instance of MongoClient and informing the connection string
-        client = MongoClient(host=[DB_HOST])
+        client = MongoClient(host=DB_HOST, port=DB_PORT)
         # Creating database
-        db = client.corpusMongo
+        db = client[DB_NAME]
 
         return db
 
