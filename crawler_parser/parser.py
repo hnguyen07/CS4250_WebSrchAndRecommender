@@ -15,7 +15,7 @@ import regex as re
 
 def connectDataBase():
     # Create a database connection object using pymongo
-    DB_NAME = 'cs_website'
+    DB_NAME = 'cs_department'
     DB_HOST = 'localhost'
     DB_PORT = 27017
 

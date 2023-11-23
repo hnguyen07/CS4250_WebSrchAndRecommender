@@ -46,18 +46,20 @@ class Frontier:
     def done(self):
         return not bool(self.urls)
 
+    def clear_frontier(self):
+        self.urls = []
+
 
 def retrieve_url(url):
     """ Get the HTML content of the URL """
     try:
         html = urlopen(url)
-        # CPP websites are originally encoded in binary form
-        return html.read().decode("utf-8")
+        return html.read().decode(encoding="iso-8859-1")
     except HTTPError as e:
-        print(f"Error retrieving URL {url}: {e}")
+        # print(f"Error retrieving URL {url}: {e}")
         return None
     except URLError as e:
-        print('The server could not be found!')
+        # print('The server could not be found!')
         return None
 
 
@@ -67,14 +69,14 @@ def store_page(url, html, counter):
         # Create an instance of MongoClient and informing the connection string
         client = MongoClient(host=['localhost:27017'])
         # Create a database
-        db = client.cs_website
+        db = client.cs_department
         # Create a collection to save the pages
         pages = db.pages
         # Save the URL and HTML content
         page = {'_id': counter, 'url': url, 'html': html}
         pages.insert_one(page)
         # Announce that the pages is stored successfully
-        print(f"Stored page from {url}")
+        # print(f"Stored page from {url}")
 
 
 def target_page(html):
@@ -102,21 +104,23 @@ def crawler_thread(frontier):
         html = retrieve_url(url)
         store_page(url, html, counter)
 
-        if target_page(html):
-            print(f"Target page found: {url}")
-            frontier = Frontier()  # Clear the frontier
-        else:
-            for new_url in parse(html):
-                is_abs_link = re.search('^http', new_url)
-                if is_abs_link:
-                    full_url = new_url
-                else:
-                    # urljoin will help join paths and handle relative path
-                    full_url = urljoin(url, new_url)
+        if html: # Check if the html is not None
+            if target_page(html):
+                print(f"Target page found: {url}")
+                frontier.clear_frontier()
+            else:
+                for new_url in parse(html):
+                    new_url = new_url.replace(' ', '')
+                    is_abs_link = re.search('^http', new_url)
+                    if is_abs_link:
+                        full_url = new_url
+                    else:
+                        # urljoin will help join paths and handle relative path
+                        full_url = urljoin(url, new_url)
 
-                # Check for duplicates before adding to the frontier
-                if full_url not in frontier.urls and full_url not in crawled_pages:
-                    frontier.add_url(full_url)
+                    # Check for duplicates before adding to the frontier
+                    if full_url not in frontier.urls and full_url not in crawled_pages:
+                        frontier.add_url(full_url)
 
 
 def main():
