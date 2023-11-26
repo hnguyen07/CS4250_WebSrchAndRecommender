@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # AUTHOR: Harry Nguyen
-# FILENAME: db_connection_mongo_solution.py
+# FILENAME: parser.py
 # SPECIFICATION: Read the CS Faculty information, parse faculty members name, title, office, email, and website, and
 #                persist this data in MongoDB collection.
 # FOR: CS 4250- Assignment #3
