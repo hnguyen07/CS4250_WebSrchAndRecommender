@@ -55,10 +55,10 @@ def retrieve_url(url):
     try:
         html = urlopen(url)
         return html.read().decode(encoding="iso-8859-1")
-    except HTTPError as e:
-        # print(f"Error retrieving URL {url}: {e}")
+    except HTTPError:
+        # print(f"Error retrieving URL {url}")
         return None
-    except URLError as e:
+    except URLError:
         # print('The server could not be found!')
         return None
 
